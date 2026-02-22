@@ -3,38 +3,443 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KSEB Smart Bill Calc Pro</title>
+    <title>KSEB Domestic Bill Calculator 2026</title>
     <style>
-        :root { --primary: #00f2fe; --accent: #4facfe; --bg: #0f172a; --card: #1e293b; --subsidy: #4ade80; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; padding: 20px; }
-        .container { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); width: 100%; max-width: 450px; border: 1px solid #334155; }
-        h2 { text-align: center; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 30px; letter-spacing: 1px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        label { display: block; font-size: 11px; text-transform: uppercase; color: #94a3b8; margin-bottom: 5px; letter-spacing: 1px; }
-        input, select { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: white; box-sizing: border-box; outline: none; transition: 0.3s; font-size: 14px; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 242, 254, 0.2); }
-        
-        .subsidy-container {
+        /* Modern Reset and Variables */
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --focus-ring: rgba(37, 99, 235, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body { 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            min-height: 100vh;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-top: 15px;
-            padding: 10px;
-            background: rgba(74, 222, 128, 0.05);
-            border-radius: 8px;
-            border: 1px dashed rgba(74, 222, 128, 0.3);
-            cursor: pointer;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-main); 
         }
-        .subsidy-container input { width: auto; cursor: pointer; }
-        .subsidy-label { color: var(--subsidy); font-size: 12px; font-weight: 600; cursor: pointer; }
 
-        button { width: 100%; padding: 15px; background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%); color: #0f172a; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 20px; text-transform: uppercase; transition: transform 0.2s; }
-        button:active { transform: scale(0.98); }
+        /* Container Styling */
+        .container { 
+            width: 100%;
+            max-width: 480px; 
+            background: var(--card-bg); 
+            padding: 35px 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05); 
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative Top Bar */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #2563eb, #38bdf8);
+        }
+
+        /* Header Styling */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
         
-        #resBox { margin-top: 25px; padding: 20px; border-radius: 12px; background: rgba(255,255,255,0.05); display: none; border-left: 4px solid var(--primary); }
-        .total-row { font-size: 32px; font-weight: 800; color: var(--primary); margin-top: 5px; }
-        .detail { font-size: 13px; color: #94a3b8; margin-bottom: 8px; display: flex; justify-content: space-between; }
-        .breakdown { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #334155; font-size: 12px; color: #64748b; line-height: 1.6; }
+        .header svg {
+            width: 48px;
+            height: 48px;
+            fill: url(#blue-grad);
+            margin-bottom: 10px;
+            filter: drop-shadow(0 4px 6px rgba(37, 99, 235, 0.2));
+        }
+
+        h2 { 
+            color: var(--text-main); 
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Form Inputs */
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+
+        /* Side-by-side reading inputs */
+        .reading-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .reading-group .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            color: #334155; 
+            font-size: 0.9rem;
+        }
+
+        input[type="number"], select { 
+            width: 100%; 
+            padding: 14px 16px; 
+            border: 2px solid var(--border-color); 
+            border-radius: 12px; 
+            font-size: 1rem; 
+            color: var(--text-main);
+            background-color: #f8fafc;
+            transition: all 0.3s ease; 
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="number"]:focus, select:focus { 
+            border-color: var(--primary); 
+            background-color: #fff;
+            box-shadow: 0 0 0 4px var(--focus-ring); 
+        }
+
+        /* Custom Toggle Switch for BPL */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .toggle-label-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .toggle-label-text span.title {
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+        .toggle-label-text span.desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: "";
+            height: 20px; width: 20px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* Button Styling */
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            background: linear-gradient(135deg, var(--primary), #3b82f6); 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: all 0.2s ease; 
+        }
+        
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* Results Section Styling */
+        #result { 
+            margin-top: 25px; 
+            padding: 25px; 
+            background: #f8fafc; 
+            border-radius: 16px; 
+            display: none; 
+            border: 1px solid var(--border-color); 
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .row { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 10px 0; 
+            border-bottom: 1px dashed #cbd5e1; 
+            font-size: 0.95rem;
+            color: #475569;
+        }
+        
+        .row-highlight {
+            background-color: #eff6ff;
+            padding: 12px;
+            border-radius: 8px;
+            border-bottom: none;
+            margin-bottom: 10px;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .row:last-of-type { border-bottom: none; }
+        .row span:last-child { font-weight: 600; color: var(--text-main); }
+        
+        .subsidy span:last-child { color: var(--success); }
+        
+        .total { 
+            margin-top: 15px; 
+            padding-top: 15px; 
+            border-top: 2px solid #cbd5e1; 
+            border-bottom: none;
+            align-items: center;
+        }
+        .total span:first-child { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+        .total span:last-child { 
+            font-size: 1.6rem; 
+            font-weight: 800; 
+            color: var(--primary); 
+            background: #eff6ff;
+            padding: 4px 12px;
+            border-radius: 8px;
+        }
+        
+        .note { 
+            font-size: 0.75rem; 
+            color: var(--text-muted); 
+            text-align: center; 
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container { padding: 25px 20px; border-radius: 16px; }
+            .reading-group { flex-direction: column; gap: 15px; }
+            button { padding: 14px; font-size: 1rem; }
+            h2 { font-size: 1.3rem; }
+            #result { padding: 20px; }
+            .total span:last-child { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<svg style="width:0;height:0;position:absolute;" aria-hidden="true" focusable="false">
+  <linearGradient id="blue-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#2563eb" />
+    <stop offset="100%" stop-color="#38bdf8" />
+  </linearGradient>
+</svg>
+
+<div class="container">
+    <div class="header">
+        <!-- Modern Lightning SVG Icon -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"/>
+        </svg>
+        <h2>KSEB Bill Calculator</h2>
+        <p class="subtitle">Accurate bi-monthly domestic tariff estimates</p>
+    </div>
+
+    <!-- Replaced single input with reading group -->
+    <div class="reading-group">
+        <div class="form-group">
+            <label for="currentReading">Current Reading</label>
+            <input type="number" id="currentReading" placeholder="e.g. 1450" min="0">
+        </div>
+        <div class="form-group">
+            <label for="previousReading">Previous Reading</label>
+            <input type="number" id="previousReading" placeholder="e.g. 1200" min="0">
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label for="phase">Phase Type</label>
+        <select id="phase">
+            <option value="single">Single Phase</option>
+            <option value="three">Three Phase</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="surcharge">Fuel Surcharge (₹ per unit)</label>
+        <input type="number" id="surcharge" step="0.001" value="0.04">
+    </div>
+    
+    <div class="toggle-group">
+        <div class="toggle-label-text">
+            <span class="title">Below Poverty Line (BPL)</span>
+            <span class="desc">Connected load &le; 1000W</span>
+        </div>
+        <label class="switch">
+            <input type="checkbox" id="isBPL">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <button onclick="calculate()">Calculate Bill</button>
+    
+    <div id="result">
+        <!-- Added a row to show consumed units dynamically -->
+        <div class="row row-highlight"><span>Total Units Consumed</span> <span id="resConsumed"></span></div>
+        <div class="row"><span>Energy Charge</span> <span id="resEnergy"></span></div>
+        <div class="row"><span>Fixed Charge</span> <span id="resFixed"></span></div>
+        <div class="row"><span>Duty (10% of Energy)</span> <span id="resDuty"></span></div>
+        <div class="row"><span>Fuel Charge</span> <span id="resSur"></span></div>
+        <div class="row"><span>Meter Rent</span> <span id="resRent"></span></div>
+        <div class="row subsidy"><span>Government Subsidy</span> <span id="resSub"></span></div>
+        <div class="row total"><span>Total Bill</span> <span id="resTotal"></span></div>
+        
+        <p class="note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            Rounded to the nearest whole rupee
+        </p>
+    </div>
+</div>
+
+<script>
+function calculate() {
+    // Replaced manual units input with current - previous logic
+    const currentReading = parseFloat(document.getElementById('currentReading').value) || 0;
+    const previousReading = parseFloat(document.getElementById('previousReading').value) || 0;
+    
+    // Calculate total consumed units (Ensures no negative values if user mistakes input order)
+    const units = Math.max(0, currentReading - previousReading);
+    
+    const phase = document.getElementById('phase').value;
+    const surRate = parseFloat(document.getElementById('surcharge').value) || 0;
+    const isBPL = document.getElementById('isBPL').checked;
+    
+    // --- EXACT LOGIC BELOW PRESERVED ---
+    
+    const monthlyAvg = units / 2;
+    let ec = 0, fc = 0, subsidy = 0;
+
+    // 1. Energy Charge Logic
+    if (isBPL && units <= 80) {
+        ec = units * 1.50;
+    } else if (monthlyAvg <= 250) {
+        let rem = units;
+        let s1 = Math.min(rem, 100); ec += s1 * 3.35; rem -= s1; 
+        let s2 = Math.min(rem, 100); ec += s2 * 4.25; rem -= s2; 
+        let s3 = Math.min(rem, 100); ec += s3 * 5.35; rem -= s3; 
+        let s4 = Math.min(rem, 100); ec += s4 * 7.20; rem -= s4; 
+        ec += rem * 8.50; 
+    } else {
+        let rate = (monthlyAvg <= 300) ? 6.75 : (monthlyAvg <= 350) ? 7.60 : 
+                   (monthlyAvg <= 400) ? 7.95 : (monthlyAvg <= 500) ? 8.25 : 9.20;
+        ec = units * rate;
+    }
+
+    // 2. Fixed Charge (Corrected: Added the missing rate arrays)
+        // 2. Fixed Charge (Updated tier from 120 to 170)
+    if (!(isBPL && units <= 80)) {
+        const fcMap = {
+            'single': [40, 60, 80, 100, 110, 130, 150, 180, 200, 250],
+            'three':  [100, 170, 140, 160, 180, 200, 220, 240, 260, 300] // Changed 120 to 170
+        };
+        const thresholds = [50, 100, 150, 200, 250, 300, 350, 400, 500, Infinity];
+        
+        // Find the index based on monthly average consumption
+        let idx = thresholds.findIndex(t => monthlyAvg <= t);
+        
+        // Multiply by 2 because the rates in fcMap are monthly, but the bill is bi-monthly
+        fc = (fcMap[phase][idx] || 0) * 2 +50 ; 
+    }
+
+
+    // 3. Subsidy Logic
+    if (monthlyAvg <= 120 && !isBPL) {
+        let subEnergy = (Math.min(units, 80) * 0.35) + (Math.max(0, units - 80) * 0.50);
+        let subFixed = 40;
+        subsidy = subEnergy + subFixed;
+    }
+
+    let duty = ec * 0.10;
+    let sur = units * surRate;
+    let rent = (phase === 'single' ? 6 : 15) * 2;
+    let total = Math.round(ec + fc + duty + sur + rent - subsidy);
+
+    // Update Display
+    document.getElementById('resConsumed').innerText = units + ' Units'; // Show calculated units
+    document.getElementById('resEnergy').innerText = '₹' + ec.toFixed(2);
+    document.getElementById('resFixed').innerText = '₹' + fc.toFixed(2);
+    document.getElementById('resDuty').innerText = '₹' + duty.toFixed(2);
+    document.getElementById('resSur').innerText = '₹' + sur.toFixed(2);
+    document.getElementById('resRent').innerText = '₹' + rent.toFixed(2);
+    document.getElementById('resSub').innerText = '-₹' + subsidy.toFixed(2);
+    document.getElementById('resTotal').innerText = '₹' + total;
+    document.getElementById('result').style.display = 'block';
+}
+
+</script>
+</body>
+      </html>        .breakdown { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #334155; font-size: 12px; color: #64748b; line-height: 1.6; }
         .sub-deduction { color: var(--subsidy); font-weight: bold; }
     </style>
 </head>
